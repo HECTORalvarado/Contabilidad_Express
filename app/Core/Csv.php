@@ -12,9 +12,9 @@ class Csv {
 
         $salida = fopen('php://output', 'w');
         fwrite($salida, "\xEF\xBB\xBF");
-        fputcsv($salida, self::celdas($encabezados));
+        fputcsv($salida, self::celdas($encabezados), ',', '"', '\\');
         foreach ($filas as $fila) {
-            fputcsv($salida, self::celdas(array_values($fila)));
+            fputcsv($salida, self::celdas(array_values($fila)), ',', '"', '\\');
         }
         fclose($salida);
         exit;

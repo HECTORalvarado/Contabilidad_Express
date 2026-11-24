@@ -12,6 +12,8 @@ $puedeVerTodo = in_array($rol, ['administrador', 'gerente', 'contador', 'tesorer
 $esOperativo = in_array($rol, ['administrador', 'gerente', 'contador', 'auxiliar'], true);
 $verCxp = $esOperativo || in_array($rol, ['encargado_cxp', 'auditor', 'tesorero'], true);
 $verCxc = $esOperativo || in_array($rol, ['encargado_cxc', 'auditor', 'tesorero'], true);
+$veDashboard = in_array($rol, ['administrador', 'gerente', 'tesorero', 'auditor'], true);
+$veReportes = in_array($rol, ['administrador', 'gerente', 'contador', 'tesorero', 'auditor'], true);
 ?><!DOCTYPE html>
 <html lang="es">
 <head>
@@ -46,6 +48,12 @@ $verCxc = $esOperativo || in_array($rol, ['encargado_cxc', 'auditor', 'tesorero'
         <ul class="nav nav-pills flex-column gap-1">
             <li class="nav-item"><a class="nav-link <?= ($_SERVER['REQUEST_URI'] ?? '/') === '/' ? 'active' : '' ?>" href="/"><i class="bi bi-house me-2"></i>Inicio</a></li>
             <?php if ($usuario): ?>
+                <?php if ($veDashboard): ?>
+                    <li class="nav-item"><a class="nav-link" href="/dashboard"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
+                <?php endif; ?>
+                <?php if ($veReportes): ?>
+                    <li class="nav-item"><a class="nav-link" href="/reportes"><i class="bi bi-file-earmark-bar-graph me-2"></i>Reportes</a></li>
+                <?php endif; ?>
                 <?php if ($esAdmin): ?>
                     <li class="nav-item"><a class="nav-link" href="/usuarios"><i class="bi bi-person-gear me-2"></i>Usuarios</a></li>
                 <?php endif; ?>

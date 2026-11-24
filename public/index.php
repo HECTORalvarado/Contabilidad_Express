@@ -63,6 +63,14 @@ $router->post('/usuarios/{id}/password', [App\Controllers\UsuariosController::cl
 
 $router->get('/bitacora', [App\Controllers\BitacoraController::class, 'index']);
 
+$router->get('/dashboard', [App\Controllers\DashboardController::class, 'index']);
+
+$router->get('/reportes', [App\Controllers\ReportesController::class, 'index']);
+$router->get('/reportes/cxc-antiguedad', [App\Controllers\ReportesController::class, 'antiguedad']);
+$router->get('/reportes/cxc-antiguedad/csv', [App\Controllers\ReportesController::class, 'exportarAntiguedad']);
+$router->get('/reportes/cxp-pendientes', [App\Controllers\ReportesController::class, 'cxp']);
+$router->get('/reportes/cxp-pendientes/csv', [App\Controllers\ReportesController::class, 'exportarCxp']);
+
 $router->get('/terceros', [App\Controllers\TercerosController::class, 'index']);
 $router->get('/terceros/crear', [App\Controllers\TercerosController::class, 'create']);
 $router->post('/terceros', [App\Controllers\TercerosController::class, 'store']);
