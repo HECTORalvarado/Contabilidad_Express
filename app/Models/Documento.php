@@ -55,7 +55,8 @@ class Documento {
             return ['error' => 'Solo se permiten archivos PDF, JPG o PNG.'];
         }
         $nombreOriginal = basename((string) ($archivo['name'] ?? 'documento'));
-        if ($nombreOriginal === '' || mb_strlen($nombreOriginal, 'UTF-8') > 255) {
+        $longitud = function_exists('mb_strlen') ? mb_strlen($nombreOriginal, 'UTF-8') : strlen($nombreOriginal);
+        if ($nombreOriginal === '' || $longitud > 255) {
             return ['error' => 'El nombre del archivo no es válido.'];
         }
 
