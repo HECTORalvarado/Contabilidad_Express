@@ -5,6 +5,7 @@
 - Fase 1 completa: login/logout con CSRF, bloqueo tras 5 fallos (15 min), inactividad 30 min, RBAC (`Auth::require`), `Audit::log` en login/fallos/logout, modelo `Usuario`.
 - T02 worker-a (big-pickle): usuarios + bitácora OK; corregido endurecimiento de filtros GET. Probado: alta/edición/estado/desbloqueo/contraseña, 403 a contador y auditor, filtros y paginación.
 - Seed re-ejecutado para dejar datos demo limpios (8 usuarios).
+- Orquestador ahora Big Pickle (opencode/big-pickle); workers reasignados en PROMPT 3.1 y .opencode/agents; php -l app/ y config/ OK.
 
 ## A medias o con error
 - Ninguno.

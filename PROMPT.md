@@ -23,17 +23,17 @@ Contabilidad Express, S.A. de C.V. (El Salvador) presta servicios contables a PY
 - Una tarea a la vez. Si algo es ambiguo, elige la opción más simple, anótala en PROGRESO.md y sigue. Pregunta solo si algo te bloquea por completo.
 
 # 3. DELEGACIÓN (opencode)
-Tú eres el modelo principal (DeepSeek V4.1 Flash Free). Los workers son modelos gratuitos, de uso limitado, temporales y de calidad desigual: úsalos para trabajo repetitivo y verifica TODO lo que devuelvan.
+Tú eres el modelo principal (Big Pickle, opencode/big-pickle). Los workers son modelos gratuitos, de uso limitado, temporales y de calidad desigual: úsalos para trabajo repetitivo y verifica TODO lo que devuelvan.
 
 3.1 Verificación de modelos
 Ejecuta `opencode models` y confirma que existen estos IDs. Usa solo los que aparezcan; si falta alguno, sáltalo y anótalo en PROGRESO.md.
-- worker-a → opencode/big-pickle (principal para módulos completos)
-- worker-b → opencode/mimo-v2.6-flash-free (respaldo de worker-a)
+- worker-a → opencode/mimo-v2.6-flash-free (principal para módulos completos)
+- worker-b → opencode/deepseek-v4.1-flash-free (solo respaldo: puede estar agotado)
 - worker-c → opencode/hy4-flash-free (vistas, filtros, reportes)
 - worker-d → opencode/beam-free (tareas triviales: seed.php, README)
 - Reservas (crea su agente solo si los anteriores fallan): opencode/flint-40b-free, opencode/iceman-free, opencode/nemotron-3.5-lightning-free.
 - NO usar para código: opencode/nemotron-3.5-super-vl-free (parece orientado a visión-lenguaje).
-- Tu propio ID debe ser opencode/deepseek-v4.1-flash-free; no lo uses en ningún worker.
+- Tu propio ID debe ser opencode/big-pickle; no lo uses en ningún worker.
 - Revisor externo, NO subagente (lo usa el usuario a mano): ver 3.10.
 
 3.2 Crear los agentes
@@ -56,7 +56,7 @@ Eres un desarrollador PHP 8.2 + PostgreSQL (PDO). Recibes un brief en docs/brief
 - Entrega código completo (sin TODO ni placeholders). Respuesta final: lista de archivos + resumen de máximo 3 líneas.
 
 3.3 Prueba de enrutamiento (una sola vez)
-Delega a worker-a con la herramienta de tareas (subagent_type "worker-a") esta tarea: "crea docs/ping.txt con la palabra OK". Si la herramienta no acepta ese subagente o el archivo no aparece, pasa al MODO MANUAL (3.8) y no lo vuelvas a intentar. Si funciona, borra el archivo, anótalo en PROGRESO.md y pídeme que confirme en la sesión hija del subagente que usó el modelo del archivo (big-pickle) y no el tuyo.
+Delega a worker-a con la herramienta de tareas (subagent_type "worker-a") esta tarea: "crea docs/ping.txt con la palabra OK". Si la herramienta no acepta ese subagente o el archivo no aparece, pasa al MODO MANUAL (3.8) y no lo vuelvas a intentar. Si funciona, borra el archivo, anótalo en PROGRESO.md y pídeme que confirme en la sesión hija del subagente que usó el modelo del archivo (mimo-v2.6-flash-free) y no el tuyo.
 
 3.4 Reparto
 - Lo haces tú: schema.sql y triggers, autenticación, RBAC, Audit::log, registro de pagos con transacción (FOR UPDATE), reglas de negocio 1-8 de la sección 7, subida y descarga de archivos, integración y corrección de lo delegado.
@@ -80,7 +80,7 @@ No simules que delegas. Escribe igualmente los briefs en docs/briefs/ y dame, pa
 Los modelos gratuitos pueden registrar tus prompts o usarlos para mejorar el modelo. Nunca incluyas en un brief ni dejes leer a un worker el .env, contraseñas o datos reales de clientes. Todo dato de prueba es ficticio.
 
 3.10 Revisión crítica con otro modelo (manual, al final de las Fases 3 y 5)
-El código crítico lo escribes tú, así que lo revisa un modelo distinto. Escribe docs/briefs/REVISION-faseN.md con: la lista de archivos críticos (schema.sql, Auth, RBAC, aprobación, pagos, subida y descarga de archivos), la checklist (reglas 1-8 de la sección 7 y la sección 9) y la instrucción "solo REPORTA problemas con archivo y línea; no reescribas nada; lee pocos archivos por turno". Dime que abra una sesión nueva (/new) con google/gemini-4-hydrogen (permite pocas solicitudes por minuto: que las haga con pausas) o, si no hay cuota, con opencode/big-pickle, y le pase ese archivo. Cuando yo te traiga el reporte, corrige lo que proceda. Si ninguno está disponible, anótalo en PROGRESO.md y continúa sin este paso.
+El código crítico lo escribes tú, así que lo revisa un modelo distinto. Escribe docs/briefs/REVISION-faseN.md con: la lista de archivos críticos (schema.sql, Auth, RBAC, aprobación, pagos, subida y descarga de archivos), la checklist (reglas 1-8 de la sección 7 y la sección 9) y la instrucción "solo REPORTA problemas con archivo y línea; no reescribas nada; lee pocos archivos por turno". Dime que abra una sesión nueva (/new) con google/gemini-4-hydrogen (permite pocas solicitudes por minuto: que las haga con pausas) o, si no hay cuota, con opencode/mimo-v2.6-flash-free, y le pase ese archivo. Cuando yo te traiga el reporte, corrige lo que proceda. Si ninguno está disponible, anótalo en PROGRESO.md y continúa sin este paso.
 
 # 4. STACK (ya decidido)
 - PHP 8.2+ puro, MVC simple: front controller en public/index.php, router mínimo, controladores, vistas PHP con layout común.

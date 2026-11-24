@@ -1,7 +1,7 @@
 ---
 description: Desarrollador PHP que implementa un módulo según un brief. No decide arquitectura.
 mode: subagent
-model: opencode/mimo-v2.6-flash-free
+model: opencode/deepseek-v4.1-flash-free
 temperature: 0.2
 permission:
   edit: allow
