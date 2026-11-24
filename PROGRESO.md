@@ -7,6 +7,8 @@
 - Seed re-ejecutado para dejar datos demo limpios (8 usuarios).
 - Orquestador ahora Big Pickle (opencode/big-pickle); workers reasignados en PROMPT 3.1 y .opencode/agents; php -l app/ y config/ OK.
 
+- T03 modelos Tercero, Factura y Documento OK (IVA desde parámetros, duplicados, saldo/vencidas, MIME real 5 MB); php -l OK.
+
 ## A medias o con error
 - Ninguno.
 
