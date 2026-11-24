@@ -1,10 +1,8 @@
 # PROGRESO
 ## Hecho
-- Fases 0 y 1: MVC, BD con trigger inmutable, seed, login/CSRF/bloqueo/RBAC/bitácora y usuarios.
-- Orquestador Big Pickle; workers a=mimo-v2.6-flash-free, b=deepseek (agotado), c=hy4, d=beam.
-- T03 modelos Tercero/Factura/Documento: IVA por parámetro, duplicados, saldo, vencidas, MIME real 5 MB.
-- T04 alta/edición de facturas y subida/descarga de documentos; prueba SQL con rollback.
-- T05 CRUD de terceros (worker-a/b sin cuota 429, worker-c con 1 corrección); T06 listado, filtros y paginación de facturas (worker-c). Fase 2 completa.
+- Fases 0-2: MVC, BD con trigger inmutable, seed, login/CSRF/bloqueo/RBAC/bitácora y usuarios.
+- T03 modelos Tercero/Factura/Documento: IVA por parámetro, duplicados, saldo, vencidas, MIME real 5 MB; T04 alta/edición y documentos; T05 CRUD terceros (worker-c, 1 corrección); T06 listado, filtros y paginación (worker-c).
+- Orquestador Big Pickle; workers a=flint-40b-free, b=iceman-free, c=hy4, d=beam; reservas nemotron→mimo→deepseek (mimo/deepseek 429: solo reintento); 429 marca agotado y se rota.
 - Verificación: php -l 33 archivos OK; HTTP 200 en /, /terceros, /facturas, /facturas/crear, /bitacora; auditor 403 en altas.
 ## A medias o con error
 - Ninguno.

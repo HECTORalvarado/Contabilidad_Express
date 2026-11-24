@@ -1,7 +1,7 @@
 ---
 description: Desarrollador PHP que implementa un módulo según un brief. No decide arquitectura.
 mode: subagent
-model: opencode/deepseek-v4.1-flash-free
+model: opencode/iceman-free
 temperature: 0.2
 permission:
   edit: allow

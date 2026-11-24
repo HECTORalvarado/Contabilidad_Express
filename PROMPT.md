@@ -27,11 +27,11 @@ Tú eres el modelo principal (Big Pickle, opencode/big-pickle). Los workers son 
 
 3.1 Verificación de modelos
 Ejecuta `opencode models` y confirma que existen estos IDs. Usa solo los que aparezcan; si falta alguno, sáltalo y anótalo en PROGRESO.md.
-- worker-a → opencode/mimo-v2.6-flash-free (principal para módulos completos)
-- worker-b → opencode/deepseek-v4.1-flash-free (solo respaldo: puede estar agotado)
+- worker-a → opencode/flint-40b-free (principal para módulos completos)
+- worker-b → opencode/iceman-free (solo respaldo: puede estar agotado)
 - worker-c → opencode/hy4-flash-free (vistas, filtros, reportes)
 - worker-d → opencode/beam-free (tareas triviales: seed.php, README)
-- Reservas (crea su agente solo si los anteriores fallan): opencode/flint-40b-free, opencode/iceman-free, opencode/nemotron-3.5-lightning-free.
+- Reservas (crea su agente solo si los anteriores fallan): opencode/nemotron-3.5-lightning-free, opencode/mimo-v2.6-flash-free, opencode/deepseek-v4.1-flash-free (estos dos solo para reintentar cuando se libere su cuota).
 - NO usar para código: opencode/nemotron-3.5-super-vl-free (parece orientado a visión-lenguaje).
 - Tu propio ID debe ser opencode/big-pickle; no lo uses en ningún worker.
 - Revisor externo, NO subagente (lo usa el usuario a mano): ver 3.10.
@@ -56,7 +56,7 @@ Eres un desarrollador PHP 8.2 + PostgreSQL (PDO). Recibes un brief en docs/brief
 - Entrega código completo (sin TODO ni placeholders). Respuesta final: lista de archivos + resumen de máximo 3 líneas.
 
 3.3 Prueba de enrutamiento (una sola vez)
-Delega a worker-a con la herramienta de tareas (subagent_type "worker-a") esta tarea: "crea docs/ping.txt con la palabra OK". Si la herramienta no acepta ese subagente o el archivo no aparece, pasa al MODO MANUAL (3.8) y no lo vuelvas a intentar. Si funciona, borra el archivo, anótalo en PROGRESO.md y pídeme que confirme en la sesión hija del subagente que usó el modelo del archivo (mimo-v2.6-flash-free) y no el tuyo.
+Delega a worker-a con la herramienta de tareas (subagent_type "worker-a") esta tarea: "crea docs/ping.txt con la palabra OK". Si la herramienta no acepta ese subagente o el archivo no aparece, pasa al MODO MANUAL (3.8) y no lo vuelvas a intentar. Si funciona, borra el archivo, anótalo en PROGRESO.md y pídeme que confirme en la sesión hija del subagente que usó el modelo del archivo (flint-40b-free) y no el tuyo.
 
 3.4 Reparto
 - Lo haces tú: schema.sql y triggers, autenticación, RBAC, Audit::log, registro de pagos con transacción (FOR UPDATE), reglas de negocio 1-8 de la sección 7, subida y descarga de archivos, integración y corrección de lo delegado.
@@ -71,7 +71,7 @@ Escribe cada brief en docs/briefs/Txx-nombre.md. Debe ser autocontenido: objetiv
 Ejecuta `php -l` en cada archivo entregado y revisa: consultas preparadas, htmlspecialchars, CSRF, permiso en servidor, bitácora, y que no tocó archivos fuera del brief. Da UNA ronda de corrección al worker; si sigue mal, cambia al siguiente worker de la cadena; si también falla, lo haces tú. Registra en PROGRESO.md: tarea → modelo → ok/corregido.
 
 3.7 Fallos y límites
-Si un worker da error, alcanza su límite, responde vacío o deja de ser gratuito, pasa al siguiente: worker-a → worker-b → worker-c → worker-d → reservas → tú. Nunca dejes un archivo a medias: termina la unidad de trabajo o márcala como pendiente en PROGRESO.md.
+Si un worker da error, alcanza su límite, responde vacío o deja de ser gratuito, pasa al siguiente: worker-a → worker-b → worker-c → worker-d → reservas → tú. Nunca dejes un archivo a medias: termina la unidad de trabajo o márcala como pendiente en PROGRESO.md. Reparte las tareas rotando entre los workers disponibles en lugar de agotar uno. Si un worker da 429, márcalo 'agotado' en PROGRESO.md y no lo uses el resto de la sesión.
 
 3.8 Modo manual (si los subagentes personalizados no funcionan)
 No simules que delegas. Escribe igualmente los briefs en docs/briefs/ y dame, para cada uno, el comando exacto para ejecutarlo en una segunda terminal: opencode run -m opencode/<modelo> "Lee docs/briefs/Txx-nombre.md y ejecútalo". Si esa versión no acepta -m, indícame cambiar de modelo con /models en una sesión nueva. Cuando yo escriba "listo", verifícalo con 3.6.
@@ -80,7 +80,7 @@ No simules que delegas. Escribe igualmente los briefs en docs/briefs/ y dame, pa
 Los modelos gratuitos pueden registrar tus prompts o usarlos para mejorar el modelo. Nunca incluyas en un brief ni dejes leer a un worker el .env, contraseñas o datos reales de clientes. Todo dato de prueba es ficticio.
 
 3.10 Revisión crítica con otro modelo (manual, al final de las Fases 3 y 5)
-El código crítico lo escribes tú, así que lo revisa un modelo distinto. Escribe docs/briefs/REVISION-faseN.md con: la lista de archivos críticos (schema.sql, Auth, RBAC, aprobación, pagos, subida y descarga de archivos), la checklist (reglas 1-8 de la sección 7 y la sección 9) y la instrucción "solo REPORTA problemas con archivo y línea; no reescribas nada; lee pocos archivos por turno". Dime que abra una sesión nueva (/new) con google/gemini-4-hydrogen (permite pocas solicitudes por minuto: que las haga con pausas) o, si no hay cuota, con opencode/mimo-v2.6-flash-free, y le pase ese archivo. Cuando yo te traiga el reporte, corrige lo que proceda. Si ninguno está disponible, anótalo en PROGRESO.md y continúa sin este paso.
+El código crítico lo escribes tú, así que lo revisa un modelo distinto. Escribe docs/briefs/REVISION-faseN.md con: la lista de archivos críticos (schema.sql, Auth, RBAC, aprobación, pagos, subida y descarga de archivos), la checklist (reglas 1-8 de la sección 7 y la sección 9) y la instrucción "solo REPORTA problemas con archivo y línea; no reescribas nada; lee pocos archivos por turno". Dime que abra una sesión nueva (/new) con google/gemini-4-hydrogen (permite pocas solicitudes por minuto: que las haga con pausas) o, si no hay cuota, con opencode/flint-40b-free, y le pase ese archivo. Cuando yo te traiga el reporte, corrige lo que proceda. Si ninguno está disponible, anótalo en PROGRESO.md y continúa sin este paso.
 
 # 4. STACK (ya decidido)
 - PHP 8.2+ puro, MVC simple: front controller en public/index.php, router mínimo, controladores, vistas PHP con layout común.
