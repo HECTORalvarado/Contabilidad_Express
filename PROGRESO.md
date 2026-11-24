@@ -4,6 +4,7 @@
 - Orquestador Big Pickle; workers a=flint-40b-free, b=iceman-free, c=hy4, d=beam; reservas nemotron→mimo→deepseek (429: solo reintento); 429 marca agotado y se rota. Ping: a y b crearon ping-a/b (borrados) y confirmaron su modelo en sesión hija.
 - Verificación: php -l 33 archivos OK; HTTP 200 en /, /terceros, /facturas, /facturas/crear, /bitacora; auditor 403 en altas; php -l app/+config/ tras cambio workers: 33/0.
 - Fase 3 (yo): Factura::aprobar/rechazar y Pago::registrar con FOR UPDATE, reglas 1-10; controlador show/aprobar/rechazar/pagar, rutas y enlace Detalle; php -l OK.
+- Fase 3 (worker-c/hy4): vista show.php, 1 corrección (faltaba import de Csrf); php -l OK; HTTP detalle y listado 200 con gerente demo.
 ## A medias o con error
 - Ninguno.
 ## Falta

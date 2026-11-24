@@ -19,9 +19,12 @@ class Factura {
     public static function find(int $id): ?array {
         $stmt = Database::getConnection()->prepare(
             'SELECT f.*, t.nombre AS tercero_nombre, t.identificador_fiscal, t.tipo AS tercero_tipo,
+                    ur.nombre AS registrado_por_nombre, ua.nombre AS aprobado_por_nombre,
                     COALESCE((SELECT SUM(p.monto) FROM pagos p WHERE p.factura_id = f.id), 0) AS pagado,
                     GREATEST(f.total - COALESCE((SELECT SUM(p.monto) FROM pagos p WHERE p.factura_id = f.id), 0), 0) AS saldo
              FROM facturas f JOIN terceros t ON t.id = f.tercero_id
+             JOIN usuarios ur ON ur.id = f.registrado_por
+             LEFT JOIN usuarios ua ON ua.id = f.aprobado_por
              WHERE f.id = :id AND f.activo = TRUE'
         );
         $stmt->execute([':id' => $id]);
