@@ -11,6 +11,8 @@
 
 - T04 registro/edición de facturas y documentos OK: FacturasController, form, rutas; IVA desde parámetro, duplicados 23505, MIME real; prueba SQL con rollback; php -l OK.
 
+- T05 CRUD terceros: worker-a y worker-b sin cuota (429); worker-c OK con 1 ronda de corrección; rutas y menú integrados; php -l OK.
+
 ## A medias o con error
 - Ninguno.
 

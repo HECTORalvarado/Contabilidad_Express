@@ -52,6 +52,7 @@ $verCxc = $esOperativo || in_array($rol, ['encargado_cxc', 'auditor', 'tesorero'
                 <?php if ($esAdmin || $rol === 'auditor'): ?>
                     <li class="nav-item"><a class="nav-link" href="/bitacora"><i class="bi bi-journal-text me-2"></i>Bitácora</a></li>
                 <?php endif; ?>
+                <li class="nav-item"><a class="nav-link" href="/terceros"><i class="bi bi-people me-2"></i>Terceros</a></li>
             <?php endif; ?>
         </ul>
     </aside>

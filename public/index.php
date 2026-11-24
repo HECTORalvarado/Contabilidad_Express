@@ -63,6 +63,13 @@ $router->post('/usuarios/{id}/password', [App\Controllers\UsuariosController::cl
 
 $router->get('/bitacora', [App\Controllers\BitacoraController::class, 'index']);
 
+$router->get('/terceros', [App\Controllers\TercerosController::class, 'index']);
+$router->get('/terceros/crear', [App\Controllers\TercerosController::class, 'create']);
+$router->post('/terceros', [App\Controllers\TercerosController::class, 'store']);
+$router->get('/terceros/{id}/editar', [App\Controllers\TercerosController::class, 'edit']);
+$router->post('/terceros/{id}', [App\Controllers\TercerosController::class, 'update']);
+$router->post('/terceros/{id}/estado', [App\Controllers\TercerosController::class, 'toggle']);
+
 $router->get('/facturas/crear', [App\Controllers\FacturasController::class, 'create']);
 $router->post('/facturas', [App\Controllers\FacturasController::class, 'store']);
 $router->get('/facturas/{id}/editar', [App\Controllers\FacturasController::class, 'edit']);
