@@ -7,7 +7,7 @@
 ## A medias o con error
 - Ninguno. Pendiente: la revisión crítica de Fase 5 debe cubrir también aprobación y pagos (archivos de la Fase 3).
 ## Falta
-- Fase 4 (dashboard + reportes CSV) y Fase 5 (permisos + revisión crítica + README).
+- Fase 4: SQL agregada ya escrita y probada en BD (`Reporte`), falta dashboard + reportes CSV; luego Fase 5.
 ## Decisiones
 - BD local `Contabilidad_express`; credenciales solo en `.env`; bitácora se reinicia con `database/seed.php`.
 - Terceros: administrador y contador editan; cualquier usuario autenticado lista. Aprueban gerente/contador/admin (nunca el registrador); pagos/cobros solo encargado_cxp/cxc.
