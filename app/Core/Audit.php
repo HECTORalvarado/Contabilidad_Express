@@ -27,4 +27,18 @@ class Audit {
             error_log('Error al registrar bitácora: ' . $e->getMessage());
         }
     }
+
+    public static function porEntidad(string $entidad, int $entidadId, int $limite = 50): array {
+        $stmt = Database::getConnection()->prepare(
+            'SELECT b.*, u.nombre AS usuario_nombre FROM bitacora b
+             LEFT JOIN usuarios u ON u.id = b.usuario_id
+             WHERE b.entidad = :entidad AND b.entidad_id = :id
+             ORDER BY b.fecha DESC, b.id DESC LIMIT :limite'
+        );
+        $stmt->bindValue(':entidad', $entidad);
+        $stmt->bindValue(':id', $entidadId, \PDO::PARAM_INT);
+        $stmt->bindValue(':limite', max(1, min(100, $limite)), \PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
 }

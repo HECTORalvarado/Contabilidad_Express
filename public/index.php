@@ -76,6 +76,10 @@ $router->post('/facturas', [App\Controllers\FacturasController::class, 'store'])
 $router->get('/facturas/{id}/editar', [App\Controllers\FacturasController::class, 'edit']);
 $router->post('/facturas/{id}', [App\Controllers\FacturasController::class, 'update']);
 $router->post('/facturas/{id}/documentos', [App\Controllers\FacturasController::class, 'subirDocumento']);
+$router->get('/facturas/{id}', [App\Controllers\FacturasController::class, 'show']);
+$router->post('/facturas/{id}/aprobar', [App\Controllers\FacturasController::class, 'aprobar']);
+$router->post('/facturas/{id}/rechazar', [App\Controllers\FacturasController::class, 'rechazar']);
+$router->post('/facturas/{id}/pagar', [App\Controllers\FacturasController::class, 'pagar']);
 $router->get('/documentos/{id}/descargar', [App\Controllers\FacturasController::class, 'descargarDocumento']);
 
 $router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $_SERVER['REQUEST_URI'] ?? '/');

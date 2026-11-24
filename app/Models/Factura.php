@@ -151,4 +151,89 @@ class Factura {
 
         return ['filas' => $stmt->fetchAll(), 'total' => $total, 'pagina' => $pagina, 'paginas' => $paginas];
     }
+
+    public static function tieneDocumento(int $id): bool {
+        $stmt = Database::getConnection()->prepare('SELECT 1 FROM documentos WHERE factura_id = :id LIMIT 1');
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetchColumn() !== false;
+    }
+
+    public static function aprobar(int $id, int $usuarioId): array {
+        return self::cambiarEstado($id, $usuarioId, 'aprobada', null, 'aprobar');
+    }
+
+    public static function rechazar(int $id, int $usuarioId, string $motivo): array {
+        return self::cambiarEstado($id, $usuarioId, 'rechazada', $motivo, 'rechazar');
+    }
+
+    private static function cambiarEstado(int $id, int $usuarioId, string $estado, ?string $motivo, string $accion): array {
+        $db = Database::getConnection();
+        $motivo = trim((string) $motivo);
+        if ($estado === 'rechazada' && ($motivo === '' || strlen($motivo) > 500)) {
+            return ['error' => 'El motivo de rechazo es obligatorio (máximo 500 caracteres).'];
+        }
+        try {
+            $db->beginTransaction();
+            $stmt = $db->prepare(
+                'SELECT id, estado, registrado_por, motivo_rechazo, aprobado_por, fecha_aprobacion
+                 FROM facturas WHERE id = :id AND activo = TRUE FOR UPDATE'
+            );
+            $stmt->execute([':id' => $id]);
+            $factura = $stmt->fetch();
+            if ($factura === false) {
+                $db->rollBack();
+                return ['error' => 'No se encontró la factura solicitada.'];
+            }
+            if ((string) $factura['estado'] !== 'pendiente_aprobacion') {
+                $db->rollBack();
+                return ['error' => 'La factura ya no está pendiente de aprobación.'];
+            }
+            if ((int) $factura['registrado_por'] === $usuarioId) {
+                $db->rollBack();
+                return ['error' => 'No puede aprobar ni rechazar una factura que usted registró.'];
+            }
+            $doc = $db->prepare('SELECT 1 FROM documentos WHERE factura_id = :id LIMIT 1');
+            $doc->execute([':id' => $id]);
+            if ($doc->fetchColumn() === false) {
+                $db->rollBack();
+                return ['error' => 'La factura necesita al menos un documento de soporte.'];
+            }
+
+            $anterior = [
+                'estado' => (string) $factura['estado'],
+                'motivo_rechazo' => $factura['motivo_rechazo'],
+                'aprobado_por' => $factura['aprobado_por'],
+                'fecha_aprobacion' => $factura['fecha_aprobacion'],
+            ];
+            if ($estado === 'aprobada') {
+                $update = $db->prepare(
+                    "UPDATE facturas SET estado = 'aprobada', motivo_rechazo = NULL,
+                     aprobado_por = :usuario, fecha_aprobacion = NOW() WHERE id = :id"
+                );
+                $update->execute([':usuario' => $usuarioId, ':id' => $id]);
+            } else {
+                $update = $db->prepare(
+                    "UPDATE facturas SET estado = 'rechazada', motivo_rechazo = :motivo,
+                     aprobado_por = NULL, fecha_aprobacion = NULL WHERE id = :id"
+                );
+                $update->execute([':motivo' => $motivo, ':id' => $id]);
+            }
+            $db->commit();
+            return [
+                'error' => null,
+                'anterior' => $anterior,
+                'nuevo' => [
+                    'estado' => $estado,
+                    'motivo_rechazo' => $estado === 'rechazada' ? $motivo : null,
+                    'aprobado_por' => $estado === 'aprobada' ? $usuarioId : null,
+                ],
+            ];
+        } catch (\Throwable $e) {
+            if ($db->inTransaction()) {
+                $db->rollBack();
+            }
+            error_log('Error al ' . $accion . ' factura: ' . $e->getMessage());
+            return ['error' => 'No se pudo completar la acción. Intente de nuevo.'];
+        }
+    }
 }

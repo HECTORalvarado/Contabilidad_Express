@@ -156,10 +156,9 @@ $urlPagina = static fn(int $n): string => '/facturas?' . http_build_query(array_
                         <td class="text-end text-nowrap"><?= $monto($f['total']) ?></td>
                         <td class="text-end text-nowrap"><?= $monto($f['saldo']) ?></td>
                         <td class="text-end">
-                            <?php if ($puedeRegistrar): ?>
-                                <a href="<?= $h('/facturas/' . $id . '/editar') ?>" class="btn btn-sm btn-outline-primary">Abrir</a>
-                            <?php else: ?>
-                                <span class="text-secondary">—</span>
+                            <a href="<?= $h('/facturas/' . $id) ?>" class="btn btn-sm btn-outline-secondary">Detalle</a>
+                            <?php if ($puedeRegistrar && in_array((string) $f['estado'], ['pendiente_aprobacion', 'rechazada'], true)): ?>
+                                <a href="<?= $h('/facturas/' . $id . '/editar') ?>" class="btn btn-sm btn-outline-primary">Editar</a>
                             <?php endif; ?>
                         </td>
                     </tr>

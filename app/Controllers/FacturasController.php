@@ -8,6 +8,7 @@ use App\Core\Flash;
 use App\Core\View;
 use App\Models\Documento;
 use App\Models\Factura;
+use App\Models\Pago;
 use App\Models\Tercero;
 use PDOException;
 
@@ -168,8 +169,8 @@ class FacturasController {
             $this->redirect('/facturas/' . (int) $id . '/editar');
         }
         $factura = Factura::find((int) $id);
-        if ($factura === null || !$this->puedeVerFactura($factura)) {
-            Flash::error('No se encontró la factura solicitada.');
+        if ($factura === null || !$this->puedeEditar($factura)) {
+            Flash::error('No se encontró la factura solicitada o ya no se puede editar.');
             $this->redirect('/facturas');
         }
 
@@ -223,6 +224,148 @@ class FacturasController {
         exit;
     }
 
+    public function show(string $id): void {
+        Auth::require();
+        $factura = Factura::find((int) $id);
+        if ($factura === null) {
+            Flash::error('No se encontró la factura solicitada.');
+            $this->redirect('/facturas');
+        }
+        if (!$this->puedeVerFactura($factura)) {
+            $this->denegar();
+        }
+
+        View::render('facturas/show', [
+            'title' => 'Detalle de factura ' . $factura['numero_documento'],
+            'factura' => $factura,
+            'documentos' => Documento::porFactura((int) $id),
+            'pagos' => Pago::porFactura((int) $id),
+            'historial' => Audit::porEntidad('facturas', (int) $id),
+            'puedeEditar' => Auth::hasRole(self::ROLES_EDICION)
+                && in_array((string) $factura['estado'], ['pendiente_aprobacion', 'rechazada'], true),
+            'puedeAprobar' => $this->puedeAprobar($factura),
+            'puedePagar' => $this->puedePagar($factura),
+            'tipoPago' => $factura['tipo'] === 'CXP' ? 'pago' : 'cobro',
+            'metodos' => Pago::METODOS,
+        ]);
+    }
+
+    public function aprobar(string $id): void {
+        Auth::require(['gerente', 'contador', 'administrador']);
+        if (!Csrf::validateToken($_POST['csrf_token'] ?? null)) {
+            Flash::error('La solicitud expiró. Intente de nuevo.');
+            $this->redirect('/facturas/' . (int) $id);
+        }
+        $factura = Factura::find((int) $id);
+        if ($factura === null || !$this->puedeVerFactura($factura)) {
+            $this->denegar();
+        }
+        if (!$this->puedeAprobar($factura)) {
+            Flash::error('No puede aprobar esta factura.');
+            $this->redirect('/facturas/' . (int) $id);
+        }
+
+        $resultado = Factura::aprobar((int) $id, (int) Auth::id());
+        if ($resultado['error'] !== null) {
+            Flash::error($resultado['error']);
+            $this->redirect('/facturas/' . (int) $id);
+        }
+        Audit::log('factura_aprobada', 'facturas', (int) $id, $resultado['anterior'], $resultado['nuevo'],
+            'Aprobación de factura', Auth::id());
+        Flash::success('La factura fue aprobada.');
+        $this->redirect('/facturas/' . (int) $id);
+    }
+
+    public function rechazar(string $id): void {
+        Auth::require(['gerente', 'contador', 'administrador']);
+        if (!Csrf::validateToken($_POST['csrf_token'] ?? null)) {
+            Flash::error('La solicitud expiró. Intente de nuevo.');
+            $this->redirect('/facturas/' . (int) $id);
+        }
+        $factura = Factura::find((int) $id);
+        if ($factura === null || !$this->puedeVerFactura($factura)) {
+            $this->denegar();
+        }
+        if (!$this->puedeAprobar($factura)) {
+            Flash::error('No puede rechazar esta factura.');
+            $this->redirect('/facturas/' . (int) $id);
+        }
+
+        $motivo = trim((string) ($_POST['motivo'] ?? ''));
+        if ($motivo === '' || strlen($motivo) > 500) {
+            Flash::error('El motivo de rechazo es obligatorio (máximo 500 caracteres).');
+            $this->redirect('/facturas/' . (int) $id);
+        }
+        $resultado = Factura::rechazar((int) $id, (int) Auth::id(), $motivo);
+        if ($resultado['error'] !== null) {
+            Flash::error($resultado['error']);
+            $this->redirect('/facturas/' . (int) $id);
+        }
+        Audit::log('factura_rechazada', 'facturas', (int) $id, $resultado['anterior'], $resultado['nuevo'],
+            'Rechazo de factura: ' . $motivo, Auth::id());
+        Flash::success('La factura fue rechazada y devuelta al registrador.');
+        $this->redirect('/facturas/' . (int) $id);
+    }
+
+    public function pagar(string $id): void {
+        Auth::require(['encargado_cxp', 'encargado_cxc']);
+        if (!Csrf::validateToken($_POST['csrf_token'] ?? null)) {
+            Flash::error('La solicitud expiró. Intente de nuevo.');
+            $this->redirect('/facturas/' . (int) $id);
+        }
+        $factura = Factura::find((int) $id);
+        if ($factura === null || !$this->puedeVerFactura($factura)) {
+            $this->denegar();
+        }
+        if (!$this->puedePagar($factura)) {
+            Flash::error('No puede registrar pagos en esta factura.');
+            $this->redirect('/facturas/' . (int) $id);
+        }
+
+        $fecha = (string) ($_POST['fecha'] ?? '');
+        $monto = trim((string) ($_POST['monto'] ?? ''));
+        $metodo = (string) ($_POST['metodo'] ?? '');
+        $referencia = trim((string) ($_POST['referencia'] ?? ''));
+        $errores = [];
+        if (!$this->esFecha($fecha)) {
+            $errores[] = 'La fecha del pago no es válida.';
+        }
+        $montoNormalizado = $this->monto($monto);
+        if ($montoNormalizado === null) {
+            $errores[] = 'El monto debe ser un número positivo con hasta 2 decimales.';
+        }
+        if (!in_array($metodo, Pago::METODOS, true)) {
+            $errores[] = 'Seleccione un método válido.';
+        }
+        if (strlen($referencia) > 100) {
+            $errores[] = 'La referencia es demasiado larga.';
+        }
+        if ($errores !== []) {
+            Flash::error(implode(' ', $errores));
+            $this->redirect('/facturas/' . (int) $id);
+        }
+
+        $resultado = Pago::registrar((int) $id, [
+            'fecha' => $fecha,
+            'monto' => $montoNormalizado,
+            'metodo' => $metodo,
+            'referencia' => $referencia,
+        ], (int) Auth::id());
+        if ($resultado['error'] !== null) {
+            Flash::error($resultado['error']);
+            $this->redirect('/facturas/' . (int) $id);
+        }
+
+        $esCxp = $factura['tipo'] === 'CXP';
+        Audit::log($esCxp ? 'pago_registrado' : 'cobro_registrado', 'facturas', (int) $id,
+            ['estado' => $resultado['estado_anterior'], 'saldo' => $resultado['saldo_anterior']],
+            ['pago_id' => $resultado['id'], 'monto' => $resultado['monto'], 'metodo' => $metodo,
+             'estado' => $resultado['estado'], 'saldo' => $resultado['saldo']],
+            $esCxp ? 'Registro de pago' : 'Registro de cobro', Auth::id());
+        Flash::success($esCxp ? 'El pago se registró correctamente.' : 'El cobro se registró correctamente.');
+        $this->redirect('/facturas/' . (int) $id);
+    }
+
     private function formulario(?array $factura): void {
         View::render('facturas/form', [
             'title' => $factura === null ? 'Nueva factura' : 'Editar factura',
@@ -258,6 +401,26 @@ class FacturasController {
             return $factura['tipo'] === 'CXC';
         }
         return in_array($rol, ['administrador', 'gerente', 'contador', 'auditor', 'tesorero'], true);
+    }
+
+    private function puedeAprobar(array $factura): bool {
+        return Auth::hasRole(['gerente', 'contador', 'administrador'])
+            && (string) $factura['estado'] === 'pendiente_aprobacion'
+            && (int) $factura['registrado_por'] !== (int) Auth::id()
+            && $this->puedeVerFactura($factura);
+    }
+
+    private function puedePagar(array $factura): bool {
+        $encargado = $factura['tipo'] === 'CXP' ? 'encargado_cxp' : 'encargado_cxc';
+        return Auth::hasRole($encargado)
+            && in_array((string) $factura['estado'], ['aprobada', 'parcial'], true)
+            && $this->puedeVerFactura($factura);
+    }
+
+    private function denegar(): void {
+        http_response_code(403);
+        View::render('errors/403', ['title' => 'Acceso denegado']);
+        exit;
     }
 
     private function validar(array $post, int $excluirId = 0, ?string $tipoFijo = null): array {
