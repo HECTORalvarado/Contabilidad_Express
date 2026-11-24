@@ -1,4 +1,10 @@
-<?php /** @var bool $dbOk */ /** @var string|null $dbError */ ?>
+<?php
+use App\Core\Auth;
+/** @var bool $dbOk */
+/** @var string|null $dbError */
+$usuario = Auth::user();
+$rol = $usuario['rol_nombre'] ?? null;
+?>
 <div class="row justify-content-center">
     <div class="col-lg-8">
         <div class="card p-4">
@@ -17,7 +23,22 @@
                 </div>
             <?php endif; ?>
 
-            <p class="text-secondary small mb-0"><i class="bi bi-info-circle me-1"></i>El inicio de sesión se habilita en la Fase 1.</p>
+            <?php if ($usuario): ?>
+                <p class="mb-3">
+                    Sesión iniciada como <strong><?= htmlspecialchars($usuario['nombre'], ENT_QUOTES, 'UTF-8') ?></strong>
+                    <span class="badge text-bg-secondary"><?= htmlspecialchars(str_replace('_', ' ', (string) $rol), ENT_QUOTES, 'UTF-8') ?></span>
+                </p>
+                <div class="d-flex flex-wrap gap-2">
+                    <?php if ($rol === 'administrador'): ?>
+                        <a class="btn btn-primary btn-sm" href="/usuarios"><i class="bi bi-person-gear me-1"></i>Usuarios</a>
+                    <?php endif; ?>
+                    <?php if (in_array($rol, ['administrador', 'auditor'], true)): ?>
+                        <a class="btn btn-outline-secondary btn-sm" href="/bitacora"><i class="bi bi-journal-text me-1"></i>Bitácora</a>
+                    <?php endif; ?>
+                </div>
+            <?php else: ?>
+                <a class="btn btn-primary" href="/login"><i class="bi bi-box-arrow-in-right me-1"></i>Iniciar sesión</a>
+            <?php endif; ?>
         </div>
     </div>
 </div>

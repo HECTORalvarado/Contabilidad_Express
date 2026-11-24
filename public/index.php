@@ -48,5 +48,8 @@ set_exception_handler(function (Throwable $e) use ($isDev): void {
 
 $router = new App\Core\Router();
 $router->get('/', [App\Controllers\HomeController::class, 'index']);
+$router->get('/login', [App\Controllers\LoginController::class, 'show']);
+$router->post('/login', [App\Controllers\LoginController::class, 'login']);
+$router->post('/logout', [App\Controllers\LoginController::class, 'logout']);
 
 $router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $_SERVER['REQUEST_URI'] ?? '/');

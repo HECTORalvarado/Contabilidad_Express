@@ -12,8 +12,7 @@ $puedeVerTodo = in_array($rol, ['administrador', 'gerente', 'contador', 'tesorer
 $esOperativo = in_array($rol, ['administrador', 'gerente', 'contador', 'auxiliar'], true);
 $verCxp = $esOperativo || in_array($rol, ['encargado_cxp', 'auditor', 'tesorero'], true);
 $verCxc = $esOperativo || in_array($rol, ['encargado_cxc', 'auditor', 'tesorero'], true);
-?>
-<!DOCTYPE html>
+?><!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -47,20 +46,6 @@ $verCxc = $esOperativo || in_array($rol, ['encargado_cxc', 'auditor', 'tesorero'
         <ul class="nav nav-pills flex-column gap-1">
             <li class="nav-item"><a class="nav-link <?= ($_SERVER['REQUEST_URI'] ?? '/') === '/' ? 'active' : '' ?>" href="/"><i class="bi bi-house me-2"></i>Inicio</a></li>
             <?php if ($usuario): ?>
-                <li class="nav-item"><a class="nav-link" href="/dashboard"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
-                <?php if ($verCxp): ?>
-                    <li class="nav-item"><a class="nav-link" href="/facturas?tipo=CXP"><i class="bi bi-arrow-up-circle me-2"></i>Cuentas por pagar</a></li>
-                <?php endif; ?>
-                <?php if ($verCxc): ?>
-                    <li class="nav-item"><a class="nav-link" href="/facturas?tipo=CXC"><i class="bi bi-arrow-down-circle me-2"></i>Cuentas por cobrar</a></li>
-                <?php endif; ?>
-                <?php if ($esOperativo): ?>
-                    <li class="nav-item"><a class="nav-link" href="/clientes"><i class="bi bi-people me-2"></i>Clientes</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/proveedores"><i class="bi bi-truck me-2"></i>Proveedores</a></li>
-                <?php endif; ?>
-                <?php if ($puedeVerTodo): ?>
-                    <li class="nav-item"><a class="nav-link" href="/reportes"><i class="bi bi-file-earmark-bar-graph me-2"></i>Reportes</a></li>
-                <?php endif; ?>
                 <?php if ($esAdmin): ?>
                     <li class="nav-item"><a class="nav-link" href="/usuarios"><i class="bi bi-person-gear me-2"></i>Usuarios</a></li>
                 <?php endif; ?>
