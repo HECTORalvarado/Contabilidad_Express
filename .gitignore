@@ -1,0 +1,6 @@
+.env
+storage/uploads/
+storage/logs/
+.DS_Store
+Thumbs.db
+*.log
