@@ -52,4 +52,15 @@ $router->get('/login', [App\Controllers\LoginController::class, 'show']);
 $router->post('/login', [App\Controllers\LoginController::class, 'login']);
 $router->post('/logout', [App\Controllers\LoginController::class, 'logout']);
 
+$router->get('/usuarios', [App\Controllers\UsuariosController::class, 'index']);
+$router->get('/usuarios/crear', [App\Controllers\UsuariosController::class, 'create']);
+$router->post('/usuarios', [App\Controllers\UsuariosController::class, 'store']);
+$router->get('/usuarios/{id}/editar', [App\Controllers\UsuariosController::class, 'edit']);
+$router->post('/usuarios/{id}', [App\Controllers\UsuariosController::class, 'update']);
+$router->post('/usuarios/{id}/estado', [App\Controllers\UsuariosController::class, 'toggle']);
+$router->post('/usuarios/{id}/desbloquear', [App\Controllers\UsuariosController::class, 'unlock']);
+$router->post('/usuarios/{id}/password', [App\Controllers\UsuariosController::class, 'resetPassword']);
+
+$router->get('/bitacora', [App\Controllers\BitacoraController::class, 'index']);
+
 $router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $_SERVER['REQUEST_URI'] ?? '/');
