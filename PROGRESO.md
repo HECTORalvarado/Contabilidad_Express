@@ -13,6 +13,8 @@
 
 - T05 CRUD terceros: worker-a y worker-b sin cuota (429); worker-c OK con 1 ronda de corrección; rutas y menú integrados; php -l OK.
 
+- T06 listado de facturas: worker-c OK sin corrección; filtros, badges, paginación y control de botones por rol; php -l OK.
+
 ## A medias o con error
 - Ninguno.
 

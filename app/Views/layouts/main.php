@@ -53,6 +53,9 @@ $verCxc = $esOperativo || in_array($rol, ['encargado_cxc', 'auditor', 'tesorero'
                     <li class="nav-item"><a class="nav-link" href="/bitacora"><i class="bi bi-journal-text me-2"></i>Bitácora</a></li>
                 <?php endif; ?>
                 <li class="nav-item"><a class="nav-link" href="/terceros"><i class="bi bi-people me-2"></i>Terceros</a></li>
+                <?php if ($verCxp || $verCxc): ?>
+                    <li class="nav-item"><a class="nav-link" href="/facturas"><i class="bi bi-receipt me-2"></i>Facturas</a></li>
+                <?php endif; ?>
             <?php endif; ?>
         </ul>
     </aside>

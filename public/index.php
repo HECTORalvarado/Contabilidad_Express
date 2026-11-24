@@ -70,6 +70,7 @@ $router->get('/terceros/{id}/editar', [App\Controllers\TercerosController::class
 $router->post('/terceros/{id}', [App\Controllers\TercerosController::class, 'update']);
 $router->post('/terceros/{id}/estado', [App\Controllers\TercerosController::class, 'toggle']);
 
+$router->get('/facturas', [App\Controllers\FacturasController::class, 'index']);
 $router->get('/facturas/crear', [App\Controllers\FacturasController::class, 'create']);
 $router->post('/facturas', [App\Controllers\FacturasController::class, 'store']);
 $router->get('/facturas/{id}/editar', [App\Controllers\FacturasController::class, 'edit']);

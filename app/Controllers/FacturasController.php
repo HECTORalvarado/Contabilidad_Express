@@ -14,6 +14,50 @@ use PDOException;
 class FacturasController {
     private const ROLES_EDICION = ['administrador', 'contador', 'auxiliar'];
 
+    public function index(): void {
+        Auth::require();
+        $rol = Auth::role();
+        $filtros = [
+            'tipo' => (string) ($_GET['tipo'] ?? ''),
+            'estado' => (string) ($_GET['estado'] ?? ''),
+            'tercero_id' => (int) ($_GET['tercero_id'] ?? 0),
+            'fecha_desde' => (string) ($_GET['fecha_desde'] ?? ''),
+            'fecha_hasta' => (string) ($_GET['fecha_hasta'] ?? ''),
+            'numero' => trim((string) ($_GET['numero'] ?? '')),
+            'solo_vencidas' => (string) ($_GET['solo_vencidas'] ?? '') === '1',
+            'pagina' => max(1, (int) ($_GET['pagina'] ?? 1)),
+        ];
+        if (!in_array($filtros['tipo'], ['CXP', 'CXC'], true)) {
+            $filtros['tipo'] = '';
+        }
+        if (!in_array($filtros['estado'], Factura::ESTADOS, true)) {
+            $filtros['estado'] = '';
+        }
+        foreach (['fecha_desde', 'fecha_hasta'] as $clave) {
+            if (!$this->esFecha($filtros[$clave])) {
+                $filtros[$clave] = '';
+            }
+        }
+        $filtros['numero'] = substr($filtros['numero'], 0, 60);
+        if ($rol === 'encargado_cxp') {
+            $filtros['tipo'] = 'CXP';
+        } elseif ($rol === 'encargado_cxc') {
+            $filtros['tipo'] = 'CXC';
+        }
+
+        $resultado = Factura::listar($filtros, $rol, (int) Auth::id());
+        View::render('facturas/index', [
+            'title' => 'Facturas',
+            'facturas' => $resultado['filas'],
+            'filtros' => $filtros,
+            'pagina' => $resultado['pagina'],
+            'paginas' => $resultado['paginas'],
+            'total' => $resultado['total'],
+            'terceros' => Tercero::activos(),
+            'puedeRegistrar' => Auth::hasRole(self::ROLES_EDICION),
+        ]);
+    }
+
     public function create(): void {
         Auth::require(self::ROLES_EDICION);
         $this->formulario(null);
