@@ -5,10 +5,11 @@
 - Verificación: php -l 33 archivos OK; HTTP 200 en /, /terceros, /facturas, /facturas/crear, /bitacora; auditor 403 en altas; php -l app/+config/ tras cambio workers: 33/0.
 - Fase 3 (yo): Factura::aprobar/rechazar y Pago::registrar con FOR UPDATE, reglas 1-10; controlador show/aprobar/rechazar/pagar, rutas y enlace Detalle; php -l OK.
 - Fase 3 (worker-c/hy4): vista show.php, 1 corrección (faltaba import de Csrf); php -l OK; HTTP detalle y listado 200 con gerente demo.
+- Revisión crítica 3.10: docs/briefs/REVISION-fase3.md listo; pendiente de ejecutar por el usuario en /new.
 ## A medias o con error
 - Ninguno.
 ## Falta
-- Fase 3: vista de detalle (worker-c), verificación y revisión crítica (3.10).
+- Ejecutar revisión crítica de Fase 3 y corregir lo que proceda; después Fase 4 y 5.
 ## Decisiones
 - BD local `Contabilidad_express`; credenciales solo en `.env`; bitácora se reinicia con `database/seed.php`.
 - Terceros: administrador y contador editan; cualquier usuario autenticado lista. Aprueban gerente/contador/admin (nunca el registrador); pagos/cobros solo encargado_cxp/cxc.
